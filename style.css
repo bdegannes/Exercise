@@ -1,0 +1,35 @@
+.container {
+  width: 980px;
+  margin: 0 auto;
+}
+
+table {
+  margin-top: 20px;
+  border-collapse:collapse;
+  width: 100%
+}
+
+table tbody > tr:nth-child(2n) {
+  background-color: #ddd;
+}
+
+table tr > td {
+  padding: 5px;
+  border: 1px solid #000000;
+
+}
+
+table thead {
+  border-radius: 5px 5px 0px 0px;
+  border: 1px solid #000000;
+}
+
+table thead .node-col {
+  cursor: pointer;
+  padding: 10px 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}

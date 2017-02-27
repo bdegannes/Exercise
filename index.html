@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.3.0/lodash.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <table>
+        <caption></caption>
+        <thead>
+          <tr>
+            <th class="node-col col-1">Node List
+              </th>
+            <th class="node-col col-2">Connections</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="search">
+        <h3>Find Path To Node</h3>
+        <input id="from" type="text" name="from" placeholder="From Node">
+        <input id="to" type="text" name="to" placeholder="To Node">
+        <input id="find" type="button" name="Find" value="Find Path">
+        <div class="path">
+          <h4>Path</h4>
+        </div>
+        <div class="min">
+          <h4>Minimum Weight</h4>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="mersenne_twister.js"></script>
+    <script type="text/javascript" src="generate_nodes.js"></script>
+    <script type="text/javascript" src="helper.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+  </body>
+</html>
