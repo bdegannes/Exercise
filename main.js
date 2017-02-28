@@ -1,5 +1,5 @@
 var Main = (function($) {
-  var count = 5000,
+  var count = 10000,
 
       // The second parameter is the seed, remove it to get a different
       // set and order on page refresh. That is:
