@@ -78,7 +78,28 @@ var nodes = {
     node7: 77
   }
 }
-
+var newNodes = {
+  node0: {
+    node1: 6,
+    node2: 82,
+    node3: 15
+  },
+  node1: {
+    node0: 6,
+    node2: 61,
+    node3: 96
+  },
+  node2: {
+    node0: 82,
+    node1: 61,
+    node3: 95
+  },
+  node3: {
+    node0: 15,
+    node1: 96,
+    node2: 95
+  }
+}
 var buildPath = function (v, pred) {
   var path = v;
   var node = v
@@ -125,26 +146,24 @@ var findMinimumWeightPath = function (graph, fromNode, toNode) {
     queue.push(v)
   }
   dist[fromNode] = 0;
+  console.log(queue);
 var count = 0
   while (queue.length !== 0) {
-    if (count > 15){
+      console.log(count);
+    if (count > 100){
       return
     }
     // find smallest in queue
     var leastDist = findSmallest(queue, dist)
-    var vertex = queue.splice(leastDist[1])
+    var vertex = queue.splice(leastDist[1], 1)
 
     smallest = leastDist[0]
 
-    console.log(leastDist);
-    return
+    console.log(queue, leastDist);
+
     if (smallest === toNode) {
       return buildMinimumWeightPath(smallest, prev)
     }
-
-    // for (connection in graph[smallest]) {
-    //   queue.push(connection)
-    // }
 
     for (connection in graph[smallest]) {
       var alt = dist[smallest] + graph[smallest][connection];
@@ -158,4 +177,4 @@ var count = 0
 };
 
 
-console.log(findMinimumWeightPath(nodes, 'node1', 'node9'))
+console.log(findMinimumWeightPath(newNodes, 'node0', 'node3'))

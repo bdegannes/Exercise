@@ -95,6 +95,18 @@ var Main = (function($) {
     return path
   };
 
+  var buildMinimumWeightPath = function (v, pred) {
+    var path = v;
+    var node = v
+
+    while (pred[node]) {
+      path = pred[node] + ' -> ' + path
+      node = pred[node]
+    }
+    return path
+  };
+
+
   var findSmallest = function  (q, dist) {
     var leastDist = Infinity;
     var smallest, idx;
@@ -148,23 +160,20 @@ var Main = (function($) {
     for (var v in graph) {
       dist[v] = Infinity;
       prev[v] = undefined;
+      queue.push(v)
     }
-
     dist[fromNode] = 0;
-    queue.push(fromNode)
 
     while (queue.length !== 0) {
+
       // find smallest in queue
       var leastDist = findSmallest(queue, dist)
-      var vertex = queue.splice(leastDist[1])
+      var vertex = queue.splice(leastDist[1], 1)
 
       smallest = leastDist[0]
+
       if (smallest === toNode) {
         return buildMinimumWeightPath(smallest, prev)
-      }
-
-      for (connection in graph[smallest]) {
-        queue.push(connection)
       }
 
       for (connection in graph[smallest]) {
@@ -180,7 +189,6 @@ var Main = (function($) {
   var sortClickAction = function () {
     var nodeListCol = document.querySelector('.col-1');
     var tbody = document.querySelector('tbody');
-    var table = document.querySelector('table');
 
     // remove row elements
     while (tbody.hasChildNodes()) {
@@ -203,6 +211,7 @@ var Main = (function($) {
     var fromInput = document.getElementById('from').value;
     var toInput = document.getElementById('to').value;
     var pathDiv = document.querySelector('.path');
+    var minDiv = document.querySelector('.min');
     var p = document.createElement('p');
 
     var nodePath = searchForPath(nodes, fromInput, toInput)
@@ -224,8 +233,6 @@ var Main = (function($) {
       var nodesArray = Helpers.createArray(nodes);
       displayNodes(nodesArray)
       registerListeners();
-      console.log(nodes);
-      // console.log('min', findMinimumWeightPath(nodes, 'node0', 'node42'));
       sortedArray = Helpers.createArray(nodes);
       sortedArray = Helpers.sortNodesArray(sortedArray)
     }
