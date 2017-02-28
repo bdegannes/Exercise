@@ -1,5 +1,5 @@
 var Main = (function($) {
-  var count = 100,
+  var count = 5000,
 
       // The second parameter is the seed, remove it to get a different
       // set and order on page refresh. That is:
@@ -44,6 +44,21 @@ var Main = (function($) {
     return row;
   }
 
+  var getNodesSetToDisplay = function (array, direction, beginAt, stopAt) {
+    var tbody = document.querySelector('tbody');
+
+    // invoke create row on each node and append to the body
+    if (direction === 'desc') {
+      for (var i = stopAt; i >= beginAt ; i--) {
+        tbody.appendChild(createRow(array[i]));
+      }
+    } else {
+      for (var i = beginAt; i < stopAt; i++) {
+        tbody.appendChild(createRow(array[i]));
+      }
+    }
+  }
+
   var displayNodes = function (nA, direction) {
     var nodesArraylength = nA.length
     var displaySetAmount = 0;
@@ -71,21 +86,6 @@ var Main = (function($) {
       getNodesSetToDisplay(nA, direction, start, displaySetAmount)
     }, 500)
 
-  }
-
-  var getNodesSetToDisplay = function (array, direction, beginAt, stopAt) {
-    var tbody = document.querySelector('tbody');
-
-    // invoke create row on each node and append to the body
-    if (direction === 'desc') {
-      for (var i = stopAt; i >= beginAt ; i--) {
-        tbody.appendChild(createRow(array[i]));
-      }
-    } else {
-      for (var i = beginAt; i < stopAt; i++) {
-        tbody.appendChild(createRow(array[i]));
-      }
-    }
   }
 
   var buildPath = function (v, pred) {
@@ -177,9 +177,9 @@ var Main = (function($) {
     }
   };
 
-  var displayPathBlocks = function (array) {
-    // build blocks for shortest path
-    var pathDiv = document.querySelector('.path');
+  var displayPathBlocks = function (array, path) {
+    // build blocks for path
+    var pathDiv = document.querySelector(path);
     var child = pathDiv.querySelector('ul');
     var ul = document.createElement('ul');
     var path = array.split(' -> ');
@@ -193,32 +193,15 @@ var Main = (function($) {
 
     for (var i = 0; i < path.length; i++) {
       var firstLi = document.createElement('li');
-      firstLi.innerHTML = path[i];
+
+      if (i === path.length - 1) {
+        firstLi.innerHTML = path[i];
+      } else {
+        firstLi.innerHTML = path[i] + ' >'
+      }
       ul.appendChild(firstLi);
     }
     pathDiv.appendChild(ul);
-  };
-
-  var displayMinPathBlocks = function (array) {
-    // Build blocks for minimum weight path
-    var minDiv = document.querySelector('.min');
-    var child = minDiv.querySelector('ul');
-    var ul = document.createElement('ul');
-    var path = array.split(' -> ');
-
-    minDiv.style.background = "#ffffff";
-    minDiv.style.color = "#000000";
-
-    if (child != null) {
-      minDiv.removeChild(child);
-    }
-
-    for (var i = 0; i < path.length; i++) {
-      var firstLi = document.createElement('li');
-      firstLi.innerHTML = path[i];
-      ul.appendChild(firstLi);
-    }
-    minDiv.appendChild(ul);
   };
 
   var findPathClickAction = function () {
@@ -227,11 +210,11 @@ var Main = (function($) {
 
     // get path for node inputs
     var nodePath = searchForPath(nodes, fromInput, toInput);
-    var minWeightPath = findMinimumWeightPath(nodes, fromInput, toInput);
+    displayPathBlocks(nodePath, '.path');
 
-    // append results
-    displayPathBlocks(nodePath);
-    displayMinPathBlocks(minWeightPath);
+    var minWeightPath = findMinimumWeightPath(nodes, fromInput, toInput);
+    displayPathBlocks(minWeightPath, '.min');
+
   };
 
   var sortClickAction = function () {
