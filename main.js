@@ -1,5 +1,5 @@
 var Main = (function($) {
-  var count = 10,
+  var count = 100,
 
       // The second parameter is the seed, remove it to get a different
       // set and order on page refresh. That is:
@@ -30,11 +30,12 @@ var Main = (function($) {
     var nodeCell = document.createElement('td');
     var connectionsCell = document.createElement('td');
 
-    // get connections
+    // get node connections
     var nodeProp = nodes[node]
     var connections = Object.keys(nodeProp);
     var connectedData = connections.join(", ");
 
+    // create cells and return row
     nodeCell.innerHTML = node;
     connectionsCell.innerHTML = connectedData;
     row.appendChild(nodeCell);
@@ -48,8 +49,9 @@ var Main = (function($) {
     var displaySetAmount = 0;
     var start = 0;
 
+    // set the number of nodes to display
     if (direction === 'desc') {
-      displaySetAmount = nodesArraylength-1;
+      displaySetAmount = nodesArraylength - 1;
       start = (nodesArraylength > 500) ? nodesArraylength - 500 : 0
     } else {
       displaySetAmount = (nodesArraylength > 500) ? 500 : nodesArraylength
@@ -57,6 +59,7 @@ var Main = (function($) {
 
     getNodesSetToDisplay(nA, direction, start, displaySetAmount);
 
+    // throttle onscroll action and displays the next set of nodes
     window.onscroll = Helpers.throttle(function () {
       if (direction === 'desc') {
         displaySetAmount = start-1;
@@ -71,9 +74,9 @@ var Main = (function($) {
   }
 
   var getNodesSetToDisplay = function (array, direction, beginAt, stopAt) {
-    // console.log(array, direction, beginAt, stopAt);
     var tbody = document.querySelector('tbody');
 
+    // invoke create row on each node and append to the body
     if (direction === 'desc') {
       for (var i = stopAt; i >= beginAt ; i--) {
         tbody.appendChild(createRow(array[i]));
@@ -93,31 +96,6 @@ var Main = (function($) {
       node = pred[node]
     }
     return path
-  };
-
-  var buildMinimumWeightPath = function (v, pred) {
-    var path = v;
-    var node = v
-
-    while (pred[node]) {
-      path = pred[node] + ' -> ' + path
-      node = pred[node]
-    }
-    return path
-  };
-
-
-  var findSmallest = function  (q, dist) {
-    var leastDist = Infinity;
-    var smallest, idx;
-    for (var i = 0; i < q.length; i++) {
-      if (dist[q[i]] <= leastDist) {
-        leastDist = dist[q[i]]
-        smallest = q[i];
-        idx = i;
-      }
-    }
-    return [smallest, idx];
   };
 
   var searchForPath = function (graph, fromNode, toNode) {
@@ -151,6 +129,19 @@ var Main = (function($) {
     }
   };
 
+  var findSmallest = function  (q, dist) {
+    var leastDist = Infinity;
+    var smallest, idx;
+    for (var i = 0; i < q.length; i++) {
+      if (dist[q[i]] <= leastDist) {
+        leastDist = dist[q[i]]
+        smallest = q[i];
+        idx = i;
+      }
+    }
+    return [smallest, idx];
+  };
+
   var findMinimumWeightPath = function (graph, fromNode, toNode) {
     // Dijkstra
     var dist = {};
@@ -173,7 +164,7 @@ var Main = (function($) {
       smallest = leastDist[0]
 
       if (smallest === toNode) {
-        return buildMinimumWeightPath(smallest, prev)
+        return buildPath(smallest, prev)
       }
 
       for (connection in graph[smallest]) {
@@ -186,45 +177,102 @@ var Main = (function($) {
     }
   };
 
+  var displayPathBlocks = function (array) {
+    // build blocks for shortest path
+    var pathDiv = document.querySelector('.path');
+    var child = pathDiv.querySelector('ul');
+    var ul = document.createElement('ul');
+    var path = array.split(' -> ');
+
+    pathDiv.style.background = "#ffffff";
+    pathDiv.style.color = "#000000";
+
+    if ( child != null ) {
+      pathDiv.removeChild(child);
+    }
+
+    for (var i = 0; i < path.length; i++) {
+      var firstLi = document.createElement('li');
+      firstLi.innerHTML = path[i];
+      ul.appendChild(firstLi);
+    }
+    pathDiv.appendChild(ul);
+  };
+
+  var displayMinPathBlocks = function (array) {
+    // Build blocks for minimum weight path
+    var minDiv = document.querySelector('.min');
+    var child = minDiv.querySelector('ul');
+    var ul = document.createElement('ul');
+    var path = array.split(' -> ');
+
+    minDiv.style.background = "#ffffff";
+    minDiv.style.color = "#000000";
+
+    if (child != null) {
+      minDiv.removeChild(child);
+    }
+
+    for (var i = 0; i < path.length; i++) {
+      var firstLi = document.createElement('li');
+      firstLi.innerHTML = path[i];
+      ul.appendChild(firstLi);
+    }
+    minDiv.appendChild(ul);
+  };
+
+  var findPathClickAction = function () {
+    var fromInput = document.getElementById('from').value;
+    var toInput = document.getElementById('to').value;
+
+    // get path for node inputs
+    var nodePath = searchForPath(nodes, fromInput, toInput);
+    var minWeightPath = findMinimumWeightPath(nodes, fromInput, toInput);
+
+    // append results
+    displayPathBlocks(nodePath);
+    displayMinPathBlocks(minWeightPath);
+  };
+
   var sortClickAction = function () {
     var nodeListCol = document.querySelector('.col-1');
     var tbody = document.querySelector('tbody');
+    var sortBoth = document.querySelector('.both');
+    var sortUp = document.querySelector('.sort-up');
+    var sortDown = document.querySelector('.sort-down');
+
+    // sort direction arrow
+    if (sortBoth) {
+      sortBoth.style.display = 'none';
+      sortUp.style.display = 'inline-block'
+    }
 
     // remove row elements
     while (tbody.hasChildNodes()) {
       tbody.removeChild(tbody.lastChild);
     }
-    // call sort
+
     if (nodeListCol.classList.contains("asc")) {
       nodeListCol.classList.remove('asc');
       nodeListCol.classList.add('desc');
+      sortUp.style.display = 'none';
+      sortDown.style.display = 'inline-block'
       displayNodes(sortedArray, 'desc');
-
     } else {
       nodeListCol.classList.remove('desc');
       nodeListCol.classList.add('asc');
-      displayNodes(sortedArray, 'asc')
+      sortDown.style.display = 'none';
+      sortUp.style.display = 'inline-block';
+      displayNodes(sortedArray, 'asc');
     }
-  }
-
-  var findPathClickAction = function () {
-    var fromInput = document.getElementById('from').value;
-    var toInput = document.getElementById('to').value;
-    var pathDiv = document.querySelector('.path');
-    var minDiv = document.querySelector('.min');
-    var p = document.createElement('p');
-
-    var nodePath = searchForPath(nodes, fromInput, toInput)
-    p.innerHTML = nodePath
-    pathDiv.appendChild(p)
-  }
+  };
 
   var registerListeners = function () {
     var nodeListCol = document.querySelector('.col-1');
-    var find = document.querySelector('#find')
+    var find = document.querySelector('#find');
 
     nodeListCol.addEventListener('click', sortClickAction);
-    find.addEventListener('click', findPathClickAction)
+    find.addEventListener('click', findPathClickAction);
   };
 
 
@@ -233,6 +281,7 @@ var Main = (function($) {
       var nodesArray = Helpers.createArray(nodes);
       displayNodes(nodesArray)
       registerListeners();
+
       sortedArray = Helpers.createArray(nodes);
       sortedArray = Helpers.sortNodesArray(sortedArray)
     }
